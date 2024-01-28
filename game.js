@@ -10,6 +10,16 @@ const game = (() => {
 	const gameStart = document.querySelector('.game__setup');
 	const squares = document.querySelectorAll('.square');
 	const playerText = document.querySelectorAll('.player__text');
+	const winnerArray = [
+		[0, 1, 2],
+		[3, 4, 5],
+		[6, 7, 8],
+		[0, 3, 6],
+		[1, 4, 7],
+		[2, 5, 8],
+		[0, 4, 8],
+		[2, 4, 6],
+	];
 
 	let playerOne;
 	let playerTwo;
@@ -31,7 +41,9 @@ const game = (() => {
 			const playerName = input.value || defaultName;
 			player.innerText = `${playerName} (${marker})`;
 
-			return {name: playerName, marker: marker};
+			const movesArray = [];
+
+			return {name: playerName, marker: marker, movesArray};
 		}
 	};
 
@@ -53,12 +65,37 @@ const game = (() => {
 		};
 
 		const updateSquare = (square) => {
-			if (square.innerText === '') {
-				console.log('test');
-				square.innerText = currentPlayer.marker;
-				square.dataset.value = currentPlayer.marker;
-				switchPlayer();
-				updateColor();
+			console.log('test');
+			square.innerText = currentPlayer.marker;
+			// square.dataset.value = currentPlayer.marker;
+
+			currentPlayer.movesArray.push(parseInt(square.dataset.value));
+
+			checkWinner();
+
+			switchPlayer();
+			updateColor();
+		};
+
+		const checkWinner = () => {
+			const currentMoves = currentPlayer.movesArray;
+
+			for (const combination of winnerArray) {
+				if (combination.every((move) => currentMoves.includes(move))) {
+					for (const move of combination) {
+						const winningSquare = squares[move];
+						winningSquare.style.color = 'var(--orange)';
+					}
+					const winner = currentPlayer.name;
+					setTimeout(() => {
+						alert(`${winner} WINS!!!`);
+						return;
+					}, 200);
+				}
+			}
+
+			if (playerOne.movesArray.length + playerTwo.movesArray.length === 9) {
+				alert("IT's A DRAW!");
 			}
 		};
 
@@ -69,8 +106,14 @@ const game = (() => {
 		const moveController = moveControl();
 		squares.forEach((square) => {
 			square.addEventListener('click', () => {
-				moveController.updateSquare(square);
-				console.log(square.dataset.value);
+				if (square.innerText === '') {
+					moveController.updateSquare(square);
+					console.log(square.dataset.value);
+					console.log(playerOne);
+					console.log(playerTwo);
+				} else {
+					return;
+				}
 			});
 		});
 	};
@@ -79,9 +122,6 @@ const game = (() => {
 		playerOne = createPlayer('player-one-input', 'player-one', 'Player 1', 'X');
 
 		playerTwo = createPlayer('player-two-input', 'player-two', 'Player 2', 'O');
-
-		console.log(playerOne);
-		console.log(playerTwo);
 
 		currentPlayer = playerOne;
 		moveGame();
