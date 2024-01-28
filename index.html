@@ -17,7 +17,7 @@
 		<script
 			src="https://kit.fontawesome.com/1387792aac.js"
 			crossorigin="anonymous"
-		></script>	
+		></script>
 		<!-- styles -->
 		<link rel="stylesheet" href="./css/style.css" />
 	</head>
@@ -26,41 +26,65 @@
 			<h1 class="title">Tic Tac Toe game</h1>
 		</div>
 
-        <div class="game__btns">
-            <button id="play-with-user" class="game__btn">Play with User</button>
-            <button id="play-with-comp" class="game__btn">Play with Computer</button>
-        </div>
-		
-        <div class="main">
-            <div class="game__content">
-                <div class="square" data-value="1"></div>
-                <div class="square" data-value="2"></div>
-                <div class="square" data-value="3"></div>
-                <div class="square" data-value="4"></div>
-                <div class="square" data-value="5"></div>
-                <div class="square" data-value="6"></div>
-                <div class="square" data-value="7"></div>
-                <div class="square" data-value="8"></div>
-                <div class="square" data-value="9"></div>
-            </div>
-            <div class="game__result">
-                <div class="player__first">
-                    <p class="player__text">Player 1 (X)</p>
-                    <p class="result__count" id="first-result">0</p>
-                </div>
-                <div class="player__tie">
-                    <p class="player__text">Tie</p>
-                    <p class="result__count" id="tie-result">0</p>
-                </div>
-                <div class="player__second">
-                    <p class="player__text">Player 2 (O)</p>
-                    <p class="player__text">Computer (O)</p>
-                    <p class="result__count" id="second-result">0</p>
-                </div>
-            </div>
-            <button id="restart__btn" class="game__btn">restart</button>
-        </div>
-		
+		<div class="game__setup">
+			<div class="player__content">
+				<label for="palyer-one-name" class="player__label"
+					>Set Player 1 name:</label
+				>
+				<input
+					type="text"
+					name="player-one-name"
+					placeholder="Player 1"
+					class="player__input"
+					id="player-one-input"
+				/>
+			</div>
+			<div class="player__content">
+				<label class="player__label" for="palyer-two-name"
+					>Set Player 2 / Computer name:</label
+				>
+				<input
+					type="text"
+					name="player-two-name"
+					placeholder="Player 2 / Computer"
+					class="player__input"
+					id="player-two-input"
+				/>
+			</div>
+
+			<button id="play-with-user" class="game__btn">Play with User</button>
+			<button id="play-with-comp" class="game__btn">Play with Computer</button>
+		</div>
+
+		<div class="main">
+			<div class="game__content">
+				<div class="square" data-value="1"></div>
+				<div class="square" data-value="2"></div>
+				<div class="square" data-value="3"></div>
+				<div class="square" data-value="4"></div>
+				<div class="square" data-value="5"></div>
+				<div class="square" data-value="6"></div>
+				<div class="square" data-value="7"></div>
+				<div class="square" data-value="8"></div>
+				<div class="square" data-value="9"></div>
+			</div>
+			<div class="game__result">
+				<div class="player__first">
+					<p class="player__text" id="player-one">Player 1 (X)</p>
+					<p class="result__count" id="first-result">0</p>
+				</div>
+				<div class="player__tie">
+					<p class="player__text">Tie</p>
+					<p class="result__count" id="tie-result">0</p>
+				</div>
+				<div class="player__second">
+					<p class="player__text" id="player-two">Player 2 (O)</p>
+					<!-- <p class="player__text" id="computer">Computer (O)</p> -->
+					<p class="result__count" id="second-result">0</p>
+				</div>
+			</div>
+			<button id="restart__btn" class="game__btn">restart</button>
+		</div>
 
 		<script src="./game.js"></script>
 	</body>

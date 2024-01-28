@@ -4,71 +4,109 @@
 // we must create array contains three win number combinations
 // we need also an epty array to catch another array of tree data-value numbers. If that combination will be the same like winning array then end game
 
-const gameboard = (() => {
-	const gameBtn = document.querySelectorAll('.game__btn');
-	const gameBtns = document.querySelector('.game__btns');
+const game = (() => {
+	const btns = document.querySelectorAll('.game__btn');
 	const main = document.querySelector('.main');
-	const playerText = document.querySelector('.player__second');
+	const gameStart = document.querySelector('.game__setup');
 	const squares = document.querySelectorAll('.square');
+	const playerText = document.querySelectorAll('.player__text');
 
-	const gameOver = false;
-	let move = true;
-	const circle = 'O';
-	const cross = 'X';
+	let playerOne;
+	let playerTwo;
+	let currentPlayer;
 
 	const showGame = () => {
+		playerText[0].style.color = 'var(--orange)';
 		main.style.visibility = 'visible';
 		main.style.opacity = '1';
-		gameBtns.style.display = 'none';
+		gameStart.style.display = 'none';
+	};
+
+	// factory function
+	const createPlayer = (inputId, playerId, defaultName, marker) => {
+		const input = document.getElementById(inputId);
+		const player = document.getElementById(playerId);
+
+		if (input && player) {
+			const playerName = input.value || defaultName;
+			player.innerText = `${playerName} (${marker})`;
+
+			return {name: playerName, marker: marker};
+		}
+	};
+
+	const moveControl = () => {
+		const switchPlayer = () => {
+			currentPlayer = currentPlayer === playerOne ? playerTwo : playerOne;
+		};
+
+		const updateColor = () => {
+			const currentPlayerText =
+				currentPlayer === playerOne ? playerText[0] : playerText[2];
+
+			currentPlayerText.style.color = 'var(--orange)';
+
+			const otherPlayerText =
+				currentPlayer === playerOne ? playerText[2] : playerText[0];
+
+			otherPlayerText.style.color = 'white';
+		};
+
+		const updateSquare = (square) => {
+			if (square.innerText === '') {
+				console.log('test');
+				square.innerText = currentPlayer.marker;
+				square.dataset.value = currentPlayer.marker;
+				switchPlayer();
+				updateColor();
+			}
+		};
+
+		return {updateSquare};
+	};
+
+	const moveGame = () => {
+		const moveController = moveControl();
+		squares.forEach((square) => {
+			square.addEventListener('click', () => {
+				moveController.updateSquare(square);
+				console.log(square.dataset.value);
+			});
+		});
 	};
 
 	const playWithUser = () => {
-		playerText.childNodes[3].style.display = 'none';
+		playerOne = createPlayer('player-one-input', 'player-one', 'Player 1', 'X');
+
+		playerTwo = createPlayer('player-two-input', 'player-two', 'Player 2', 'O');
+
+		console.log(playerOne);
+		console.log(playerTwo);
+
+		currentPlayer = playerOne;
+		moveGame();
 	};
 
 	const playWithComp = () => {
-		playerText.childNodes[1].style.display = 'none';
+		playerOne = createPlayer('player-one-input', 'player-one', 'Player 1', 'X');
+
+		comp = createPlayer('player-two-input', 'player-two', 'Computer', 'O');
 	};
 
-	const choosePlayer = (e) => {
-		if (e.target.id === 'play-with-user') {
-		} else if (e.target.id === 'play-with-comp') {
-		}
-	};
-
-	const setVal = (square) => {
-		console.log(square.innerText);
-		if (square.innerText === '') {
-			console.log('EMPTY!');
-			square.innerText = cross;
-		} else if (square.innerText !== '') {
-			return;
-		}
-	};
-
-	const moveToggle = () => {
-		move = !move;
-		console.log(move);
-	};
-
-	squares.forEach((square) => {
-		square.addEventListener('click', () => {
-			moveToggle();
-			setVal(square);
-		});
-	});
-
-	gameBtn.forEach((btn) => {
-		btn.addEventListener('click', (event) => {
-			if (event.target.id === 'play-with-user') {
+	const initGame = () => {
+		btns.forEach((btn) => {
+			btn.addEventListener('click', (event) => {
 				showGame();
-				playWithUser();
-			} else if (event.target.id === 'play-with-comp') {
-				showGame();
-				playWithComp();
-			} else if (event.target.id === 'restart__btn') {
-				console.log('NOTHIG YET');
-			}
+				if (event.target.id === 'play-with-user') {
+					playWithUser();
+				} else if (event.target.id === 'play-with-comp') {
+					playWithComp();
+				} else if (event.target.id === 'restart__btn') {
+					location.reload();
+				}
+			});
 		});
-	});
+	};
+
+	initGame();
 })();
