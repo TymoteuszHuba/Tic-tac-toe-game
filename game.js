@@ -1,16 +1,13 @@
-// ----------- to do -----------------
-// gameOver flag which will inform us about end game, after fires set also points to winner
-// move which control (true, false) who whill make a move X or O
-// we must create array contains three win number combinations
-// we need also an epty array to catch another array of tree data-value numbers. If that combination will be the same like winning array then end game
-
+// IIFE function to keep code encapsulated
 const game = (() => {
 	const btns = document.querySelectorAll('.game__btn');
 	const main = document.querySelector('.main');
 	const gameStart = document.querySelector('.game__setup');
-	const squares = document.querySelectorAll('.square');
 	const playerText = document.querySelectorAll('.player__text');
-	const winnerArray = [
+	const inputs = document.querySelectorAll('.player__input');
+	const squares = document.querySelectorAll('.square');
+	const tie = document.querySelector('#tie-result');
+	const winningArray = [
 		[0, 1, 2],
 		[3, 4, 5],
 		[6, 7, 8],
@@ -24,6 +21,7 @@ const game = (() => {
 	let playerOne;
 	let playerTwo;
 	let currentPlayer;
+	let tieScore = 0;
 
 	const showGame = () => {
 		playerText[0].style.color = 'var(--orange)';
@@ -33,84 +31,118 @@ const game = (() => {
 	};
 
 	// factory function
-	const createPlayer = (inputId, playerId, defaultName, marker) => {
+	const createPlayer = (inputId, playerId, defautName, marker, scoreId) => {
 		const input = document.getElementById(inputId);
 		const player = document.getElementById(playerId);
+		const scoreElement = document.getElementById(scoreId);
+		let score = 0;
 
 		if (input && player) {
-			const playerName = input.value || defaultName;
+			const playerName = input.value || defautName;
 			player.innerText = `${playerName} (${marker})`;
 
 			const movesArray = [];
-
-			return {name: playerName, marker: marker, movesArray};
+			const playerObject = {
+				name: playerName,
+				marker: marker,
+				movesArray: movesArray,
+				score: score,
+				updateScore: function () {
+					score++;
+					scoreElement.innerText = score;
+				},
+			};
+			return playerObject;
 		}
 	};
 
-	const moveControl = () => {
+	const controlGame = () => {
 		const switchPlayer = () => {
 			currentPlayer = currentPlayer === playerOne ? playerTwo : playerOne;
 		};
 
-		const updateColor = () => {
-			const currentPlayerText =
-				currentPlayer === playerOne ? playerText[0] : playerText[2];
-
-			currentPlayerText.style.color = 'var(--orange)';
-
-			const otherPlayerText =
-				currentPlayer === playerOne ? playerText[2] : playerText[0];
-
-			otherPlayerText.style.color = 'white';
+		const colorChange = () => {
+			if (currentPlayer === playerTwo) {
+				playerText[0].style.color = 'var(--orange)';
+				playerText[2].style.color = 'var(--white)';
+			} else if (currentPlayer === playerOne) {
+				playerText[2].style.color = 'var(--orange)';
+				playerText[0].style.color = 'var(--white)';
+			}
 		};
 
-		const updateSquare = (square) => {
-			console.log('test');
-			square.innerText = currentPlayer.marker;
-			// square.dataset.value = currentPlayer.marker;
+		const setValue = (val) => {
+			val.innerText = currentPlayer.marker;
+			currentPlayer.movesArray.push(parseInt(val.dataset.value));
+		};
 
-			currentPlayer.movesArray.push(parseInt(square.dataset.value));
-
-			checkWinner();
-
-			switchPlayer();
-			updateColor();
+		const tieCheck = () => {
+			tieScore++;
+			tie.innerText = tieScore;
 		};
 
 		const checkWinner = () => {
 			const currentMoves = currentPlayer.movesArray;
 
-			for (const combination of winnerArray) {
-				if (combination.every((move) => currentMoves.includes(move))) {
+			for (const combination of winningArray) {
+				const isWinningCombination = combination.every((move) =>
+					currentMoves.includes(move)
+				);
+
+				if (isWinningCombination) {
 					for (const move of combination) {
 						const winningSquare = squares[move];
 						winningSquare.style.color = 'var(--orange)';
 					}
+
 					const winner = currentPlayer.name;
+
 					setTimeout(() => {
-						alert(`${winner} WINS!!!`);
-						return;
-					}, 200);
+						alert(`THE WINNER IS: ${winner}!!`);
+						currentPlayer.updateScore();
+						claerBoard();
+					}, 300);
+
+					return;
 				}
 			}
 
 			if (playerOne.movesArray.length + playerTwo.movesArray.length === 9) {
-				alert("IT's A DRAW!");
+				setTimeout(() => {
+					alert("IT's A DRAW!");
+					tieCheck();
+					claerBoard();
+				}, 300);
 			}
+		};
+
+		const claerBoard = () => {
+			squares.forEach((square) => {
+				square.innerText = '';
+				square.style.color = 'var(--white)';
+			});
+			playerOne.movesArray = [];
+			playerTwo.movesArray = [];
+		};
+
+		const updateSquare = (square) => {
+			switchPlayer();
+			setValue(square);
+			colorChange();
+			checkWinner();
+			console.log(currentPlayer);
 		};
 
 		return {updateSquare};
 	};
 
 	const moveGame = () => {
-		const moveController = moveControl();
+		const gameController = controlGame();
 		squares.forEach((square) => {
 			square.addEventListener('click', () => {
 				if (square.innerText === '') {
-					moveController.updateSquare(square);
+					gameController.updateSquare(square);
 					console.log(square.dataset.value);
-					console.log(playerOne);
-					console.log(playerTwo);
 				} else {
 					return;
 				}
@@ -119,30 +151,51 @@ const game = (() => {
 	};
 
 	const playWithUser = () => {
-		playerOne = createPlayer('player-one-input', 'player-one', 'Player 1', 'X');
+		playerOne = createPlayer(
+			'player-one-input',
+			'player-one',
+			'Player 1',
+			'X',
+			'first-result'
+		);
 
-		playerTwo = createPlayer('player-two-input', 'player-two', 'Player 2', 'O');
+		playerTwo = createPlayer(
+			'player-two-input',
+			'player-two',
+			'Player 2',
+			'O',
+			'second-result'
+		);
 
-		currentPlayer = playerOne;
+		showGame();
 		moveGame();
+		console.log(playerOne);
+		console.log(playerTwo);
 	};
 
 	const playWithComp = () => {
-		playerOne = createPlayer('player-one-input', 'player-one', 'Player 1', 'X');
+		showGame();
 
+		playerOne = createPlayer('player-one-input', 'player-one', 'Player 1', 'X');
 		comp = createPlayer('player-two-input', 'player-two', 'Computer', 'O');
 	};
 
+	const restartGame = () => {
+		location.reload();
+		inputs.forEach((input) => {
+			input.value = '';
+		});
+	};
 	const initGame = () => {
 		btns.forEach((btn) => {
 			btn.addEventListener('click', (event) => {
-				showGame();
 				if (event.target.id === 'play-with-user') {
 					playWithUser();
 				} else if (event.target.id === 'play-with-comp') {
 					playWithComp();
 				} else if (event.target.id === 'restart__btn') {
-					location.reload();
+					console.log('TO DO');
+					restartGame();
 				}
 			});
 		});
