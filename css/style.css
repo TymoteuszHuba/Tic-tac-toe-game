@@ -90,6 +90,7 @@ body {
 	text-transform: uppercase;
 	cursor: pointer;
 	transition: box-shadow 0.2s ease-in-out;
+    
 }
 
 .game__btn:hover {

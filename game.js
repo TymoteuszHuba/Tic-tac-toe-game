@@ -125,24 +125,64 @@ const game = (() => {
 			playerTwo.movesArray = [];
 		};
 
-		const updateSquare = (square) => {
-			switchPlayer();
-			setValue(square);
-			colorChange();
-			checkWinner();
-			console.log(currentPlayer);
-		};
-
-		return {updateSquare};
+		return {switchPlayer, setValue, colorChange, checkWinner};
 	};
 
-	const moveGame = () => {
+	const updateSquare = (square) => {
 		const gameController = controlGame();
+		gameController.switchPlayer();
+		gameController.setValue(square);
+		gameController.colorChange();
+		gameController.checkWinner();
+		// makeComputerMove(square);
+		console.log(currentPlayer);
+	};
+
+	const makeComputerMove = (sq) => {
+		const emptySquares = Array.from(squares).filter(
+			(sq) => sq.innerText === ''
+		);
+
+		if (emptySquares.length > 0) {
+			console.log('PLAYER 2');
+			let randomIndex;
+			let selectedSquare;
+			do {
+				randomIndex = Math.floor(Math.random() * emptySquares.length);
+				selectedSquare = emptySquares[randomIndex];
+			} while (
+				(playerOne.movesArray.includes(selectedSquare.dataset.value) ||
+					playerTwo.movesArray.includes(selectedSquare.dataset.value) ||
+					selectedSquare === sq) &&
+				emptySquares.length > 1
+			);
+
+			// const selectedSquare = emptySquares[randomIndex];
+			console.log('randomIndex: ' + randomIndex);
+			// console.log('electedSquare: ' * selectedSquare);
+			console.log(playerOne.movesArray);
+			updateSquare(sq);
+			setTimeout(() => {
+				updateSquare(selectedSquare);
+			}, 300);
+		}
+
+		// updateSquare(selectedSquare);
+	};
+
+	const moveGame = (e) => {
+		console.log(e.target);
+
 		squares.forEach((square) => {
 			square.addEventListener('click', () => {
 				if (square.innerText === '') {
-					gameController.updateSquare(square);
-					console.log(square.dataset.value);
+					if (e.target.id === 'play-with-user') {
+						updateSquare(square);
+						console.log(e.target.id);
+					} else if (e.target.id === 'play-with-comp') {
+						makeComputerMove(square);
+						// updateSquare(square);
+					}
 				} else {
 					return;
 				}
@@ -150,34 +190,54 @@ const game = (() => {
 		});
 	};
 
-	const playWithUser = () => {
-		playerOne = createPlayer(
-			'player-one-input',
-			'player-one',
-			'Player 1',
-			'X',
-			'first-result'
-		);
+	const playWith = (e) => {
+		if (e.target.id === 'play-with-user') {
+			console.log('Start playing with user!');
+			playerOne = createPlayer(
+				'player-one-input',
+				'player-one',
+				'Player 1',
+				'X',
+				'first-result'
+			);
 
-		playerTwo = createPlayer(
-			'player-two-input',
-			'player-two',
-			'Player 2',
-			'O',
-			'second-result'
-		);
+			playerTwo = createPlayer(
+				'player-two-input',
+				'player-two',
+				'Player 2',
+				'O',
+				'second-result'
+			);
 
-		showGame();
-		moveGame();
-		console.log(playerOne);
-		console.log(playerTwo);
-	};
+			showGame();
+			moveGame(e);
+			console.log(playerOne);
+			console.log(playerTwo);
+		} else if (e.target.id === 'play-with-comp') {
+			console.log('Start playing with computer!');
+			playerOne = createPlayer(
+				'player-one-input',
+				'player-one',
+				'Player 1',
+				'X',
+				'first-result'
+			);
 
-	const playWithComp = () => {
-		showGame();
+			playerTwo = createPlayer(
+				'player-two-input',
+				'player-two',
+				'Computer',
+				'O',
+				'second-result'
+			);
 
-		playerOne = createPlayer('player-one-input', 'player-one', 'Player 1', 'X');
-		comp = createPlayer('player-two-input', 'player-two', 'Computer', 'O');
+			showGame();
+			moveGame(e);
+			console.log(playerOne);
+			console.log(playerTwo);
+		} else if (e.target.id === 'restart__btn') {
+			restartGame();
+		}
 	};
 
 	const restartGame = () => {
@@ -186,17 +246,11 @@ const game = (() => {
 			input.value = '';
 		});
 	};
+
 	const initGame = () => {
 		btns.forEach((btn) => {
 			btn.addEventListener('click', (event) => {
-				if (event.target.id === 'play-with-user') {
-					playWithUser();
-				} else if (event.target.id === 'play-with-comp') {
-					playWithComp();
-				} else if (event.target.id === 'restart__btn') {
-					console.log('TO DO');
-					restartGame();
-				}
+				playWith(event);
 			});
 		});
 	};
